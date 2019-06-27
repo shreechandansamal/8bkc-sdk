@@ -16,6 +16,9 @@ Some easy-to-use-ish widgets for common use sceanarios. Need to have uGUI initia
 #include "ugui.h"
 #include "8bkcgui-widgets.h"
 
+#define MAX_CHR (KC_SCREEN_W/7)
+#define MAX_ITEM (KC_SCREEN_H/9)
+
 
 //Filter for kcugui_filechooser_filter_glob. Accepts multiple globs separated by a comma: "*.gb,*.gbc"
 int kcugui_filechooser_filter_glob(const char *name, void *filterarg) {
@@ -90,7 +93,7 @@ int kcugui_filechooser_filter(fc_filtercb_t filter, void *filterarg, char *desc,
 			UG_PutString(0, 32, "*NO FILES*");
 		} else {
 			UG_SetForecolor(C_WHITE);
-			for (int y=(scpos<0)?-scpos:0; y<6; y++) {
+			for (int y=(scpos<0)?-scpos:0; y<(MAX_ITEM+2); y++) {
 				if (fd==APPFS_INVALID_FD) {
 					endpos=p-1;
 					break;
@@ -105,9 +108,9 @@ int kcugui_filechooser_filter(fc_filtercb_t filter, void *filterarg, char *desc,
 					UG_SetForecolor(C_BLUE);
 				}
 				//stop name from wrapping around
-				char truncnm[12];
-				strncpy(truncnm, name, 11);
-				truncnm[11]=0;
+				char truncnm[MAX_CHR+1];
+				strncpy(truncnm, name, MAX_CHR);
+				truncnm[MAX_CHR]=0;
 				if (flags & KCUGUI_FILE_FLAGS_NOEXT) remove_ext(truncnm);
 				//show
 				UG_PutString(0, 12+8*y, truncnm);
@@ -119,7 +122,7 @@ int kcugui_filechooser_filter(fc_filtercb_t filter, void *filterarg, char *desc,
 		kcugui_flush();
 
 		if (flags & KCUGUI_FILE_FLAGS_NOEXT) remove_ext(selFn);
-		if (strlen(selFn)>11) strncat(selFn, "   ", 64);
+		if (strlen(selFn)>MAX_CHR) strncat(selFn, "    ", 64);
 		selScr=0;
 
 		int prKeys;
@@ -135,7 +138,7 @@ int kcugui_filechooser_filter(fc_filtercb_t filter, void *filterarg, char *desc,
 			if (prKeys&KC_BTN_DOWN) {
 				curspos++;
 				if (curspos>endpos) curspos--;
-				if (curspos>(scpos+4)) scpos++;
+				if (curspos>(scpos+MAX_ITEM)) scpos++;
 			}
 			if (prKeys&KC_BTN_A) {
 				kchal_wait_keys_released();
@@ -149,11 +152,11 @@ int kcugui_filechooser_filter(fc_filtercb_t filter, void *filterarg, char *desc,
 			}
 			oldkeys=keys;
 			vTaskDelay(30/portTICK_PERIOD_MS);
-			if (strlen(selFn)>11) {
+			if (strlen(selFn)>MAX_CHR) {
 				selScr++;
 				UG_SetForecolor(C_WHITE);
 				int cp=selScr/6;
-				for (int i=0; i<14; i++) {
+				for (int i=0; i<(MAX_CHR+5); i++) {
 					cp=cp%strlen(selFn);
 					UG_PutChar(selFn[cp], i*6-(selScr%6), selPos, C_WHITE, C_BLACK);
 					cp++;
@@ -192,7 +195,7 @@ int kcugui_menu(kcugui_menuitem_t *menu, char *desc, kcugui_menu_cb_t cb, void *
 			selPos=-1;
 		} else {
 			UG_SetForecolor(C_WHITE);
-			for (int y=(scpos<0)?-scpos:0; y<6; y++) {
+			for (int y=(scpos<0)?-scpos:0; y<MAX_ITEM+2; y++) {
 				if (menu[p].flags&KCUGUI_MENUITEM_LAST) {
 					endpos=p-1;
 					if (p==2) {
@@ -208,9 +211,9 @@ int kcugui_menu(kcugui_menuitem_t *menu, char *desc, kcugui_menu_cb_t cb, void *
 					UG_SetForecolor(C_BLUE);
 				}
 				//stop name from wrapping around
-				char truncnm[12];
-				strncpy(truncnm, menu[p].name, 11);
-				truncnm[11]=0;
+				char truncnm[MAX_CHR+1];
+				strncpy(truncnm, menu[p].name, MAX_CHR);
+				truncnm[MAX_CHR]=0;
 				//show
 				UG_PutString(0, 12+8*y, truncnm);
 				p++;
@@ -232,7 +235,7 @@ int kcugui_menu(kcugui_menuitem_t *menu, char *desc, kcugui_menu_cb_t cb, void *
 			if (prKeys&KC_BTN_DOWN) {
 				curspos++;
 				if (curspos>endpos) curspos--;
-				if (curspos>(scpos+4)) scpos++;
+				if (curspos>(scpos+MAX_ITEM)) scpos++;
 			}
 			if (prKeys&KC_BTN_A) {
 				kchal_wait_keys_released();
@@ -246,11 +249,11 @@ int kcugui_menu(kcugui_menuitem_t *menu, char *desc, kcugui_menu_cb_t cb, void *
 			}
 			
 			vTaskDelay(30/portTICK_PERIOD_MS);
-			if (selPos>0 && strlen(menu[curspos].name)>11) {
+			if (selPos>0 && strlen(menu[curspos].name)>MAX_CHR) {
 				selScr++;
 				UG_SetForecolor(C_WHITE);
 				int cp=selScr/6;
-				for (int i=0; i<14; i++) {
+				for (int i=0; i<(MAX_CHR+5); i++) {
 					cp=cp%(strlen(menu[curspos].name)+3);
 					char mc;
 					if (cp>=strlen(menu[curspos].name)) {

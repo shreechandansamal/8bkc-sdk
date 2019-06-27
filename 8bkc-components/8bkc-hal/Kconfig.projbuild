@@ -16,6 +16,9 @@ config HW_WROVERKIT_V1
 config HW_WROVERKIT_V2
 	bool "ESP_Wrover_Kit v2 or later (black PCB)"
 
+config HW_POCKETSPRITE_CLONE
+	bool "PocketSprite clone hardware (with real function)"
+
 config HW_CUSTOM
 	bool "Custom hardware"
 
@@ -146,7 +149,7 @@ config HW_LCD_BL_GPIO
 
 choice HW_INPUT_SEL
 	prompt "Input method"
-	depends on !HW_POCKETSPRITE
+	depends on HW_CUSTOM || HW_WROVERKIT_V1 || HW_WROVERKIT_V2
 	help
 		If you use a non-PocketSprite board, you can use one of multiple methods to handle
 		the DPAD/start/select/A/B input. Select which one you want to use here.

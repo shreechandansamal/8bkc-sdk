@@ -14,6 +14,9 @@ COMPONENT_OBJS := hexdump.o kcugui.o vfs-stdout.o
 
 ifdef CONFIG_HW_POCKETSPRITE
 COMPONENT_OBJS += io-pksp.o kchal-pksp.o ssd1331.o
+endif
+ifdef CONFIG_HW_POCKETSPRITE_CLONE
+COMPONENT_OBJS += io-pksp-clone.o kchal-pksp-clone.o st7735r.o	
 else
 COMPONENT_OBJS += kchal-fake.o spi_lcd.o 
 ifdef CONFIG_HW_INPUT_PSX
