@@ -83,10 +83,8 @@ static void flushConfigToNvs() {
 Management thread. Handles charging indicator, extra-long presses.
 */
 static void kchal_mgmt_task(void *arg) {
-	#if 1 // not implemented yet
 	static int ledBlink=0;	
-	//int oldChgStatus=-1;
-	#endif
+	int oldChgStatus=-1;
 	uint32_t keys;
 	int longCt=0;
 	int checkConfCtr=0;
@@ -101,12 +99,9 @@ static void kchal_mgmt_task(void *arg) {
 		}
 		
 		//See if we're charging; if so, modify 'LED'.
-		
-		#if 1 // not implemented yet
-
-		//int chgStatus=ioGetChgStatus();
-		//if (chgStatus!=oldChgStatus) {
-		//	if (chgStatus==IO_CHG_NOCHARGER) {
+		int chgStatus=ioGetChgStatus();
+		if (chgStatus!=oldChgStatus) {
+			if (chgStatus==IO_CHG_NOCHARGER) {
 				if (kchal_get_bat_pct()<10) {
 					ledBlink^=1;
 					setLed(0xF800);
@@ -118,23 +113,17 @@ static void kchal_mgmt_task(void *arg) {
 				} else {
 					setLed(0xF800);
 				}
-		//	} else if (chgStatus==IO_CHG_CHARGING) {
-		//		ledBlink^=1;
-		//		if (ledBlink&1) {
-		//			setLed(0x07E0);
-		//		} else {
-		//			setLed(0x0400);
-		//		}
-		//	} else if (chgStatus==IO_CHG_FULL) {
-		//		setLed(0x07E0);
-		//	}
-		//}
-		
-		#else // just set led for now
-
-		setLed(0x07E0);
-
-		#endif
+			} else if (chgStatus==IO_CHG_CHARGING) {
+				ledBlink^=1;
+				if (ledBlink&1) {
+					setLed(0x07E0);
+				} else {
+					setLed(0x0400);
+				}
+			} //else if (chgStatus==IO_CHG_FULL) {
+			//	setLed(0x07E0);
+			//}
+		}
 
 		checkConfCtr++;
 		if (checkConfCtr==6) {
@@ -160,14 +149,9 @@ void kchal_cal_adc() {
 #define BAT_EMPTY_MV 3200
 
 int kchal_get_bat_mv() {
-	#if 1
 	int v=ioGetVbatAdcVal();
 	if (battFullAdcVal==0) return 0;
 	return (v*BAT_FULL_MV)/battFullAdcVal;
-	#else
-	return 3600;
-	#endif
-
 }
 
 int kchal_get_bat_pct() {
@@ -237,7 +221,6 @@ static int initstate=0;
 
 static void kchal_init_common(int flags) {
 	//Use this info to measure battery voltage. If too low, refuse to start.
-	#if 1
 	ioVbatForceMeasure();
 	printf("Battery voltage: %d mv\n", kchal_get_bat_mv());
 	if (kchal_get_bat_pct() == 0) {
@@ -245,7 +228,6 @@ static void kchal_init_common(int flags) {
 		show_bat_empty_icon();
 		kchal_power_down();
 	}
-	#endif
 	st7735rSetBrightness(config.brightness);
 	initstate|=INIT_COMMON_DONE;
 }
@@ -517,11 +499,7 @@ void kchal_exit_to_chooser() {
 }
 
 int kchal_get_chg_status() {
-	#if 0
 	return ioGetChgStatus();
-	#else
-	return KC_CHG_NOCHARGER;
-	#endif
 }
 
 void kchal_set_new_app(int fd) {

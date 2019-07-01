@@ -11,10 +11,7 @@ void ioAmplifierOff();
 void ioInit();
 void ioPowerDown();
 void ioOledPowerDown();
-
-/* not implemented yet
 int ioGetChgStatus();
-*/
 int ioGetVbatAdcVal();
 void ioVbatForceMeasure();
 

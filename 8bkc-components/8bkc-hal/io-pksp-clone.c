@@ -29,6 +29,7 @@
 #define GPIO_BTN_PWR_PIN 32
 #define GPIO_BTN_PWR ((uint64_t)1<<GPIO_BTN_PWR_PIN)
 #define GPIO_SOUND_EN (1<<17)
+#define GPIO_CHGSTDBY (1<<2)  //micro-usb plugged
 
 #define GPIO_DAC (1<<26)
 #define VBAT_ADC_CHAN ADC1_CHANNEL_0
@@ -60,6 +61,19 @@ void ioVbatForceMeasure() {
 	}
 	WRITE_PERI_REG(GPIO_OUT_W1TC_REG, GPIO_VBAT_EN);
 	vTaskDelay(20 / portTICK_PERIOD_MS);
+}
+
+int ioGetChgStatus() {
+	uint64_t io=((uint64_t)GPIO.in1.data<<32)|GPIO.in;
+	if ((io&GPIO_CHGSTDBY)==0) {
+		return IO_CHG_NOCHARGER;
+	} else {
+		//if ((io&GPIO_CHGDET)==0) {
+			return IO_CHG_CHARGING;
+		//} else {
+		//	return IO_CHG_FULL;
+		//}
+	}
 }
 
 int ioJoyReadInput() {
