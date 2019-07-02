@@ -29,11 +29,10 @@
 #define GPIO_BTN_PWR_PIN 32
 #define GPIO_BTN_PWR ((uint64_t)1<<GPIO_BTN_PWR_PIN)
 #define GPIO_SOUND_EN (1<<17)
-#define GPIO_CHGSTDBY (1<<2)  //micro-usb plugged
 
 #define GPIO_DAC (1<<26)
 #define VBAT_ADC_CHAN ADC1_CHANNEL_0
-#define GPIO_VBAT_EN ((uint64_t)1UL<<33UL)
+#define GPIO_CHGSTDBY ((uint64_t)1UL<<33UL) //micro-usb plugged
 
 #define VBATMEAS_HISTCT 16
 
@@ -53,14 +52,10 @@ int ioGetVbatAdcVal() {
 }
 
 void ioVbatForceMeasure() {	
-	WRITE_PERI_REG(GPIO_OUT_W1TS_REG, GPIO_VBAT_EN);
-	vTaskDelay(20 / portTICK_PERIOD_MS);
 	for (int i=0; i<VBATMEAS_HISTCT; i++) {
 		vTaskDelay(1);
 		vbatHist[i]=adc1_get_raw(VBAT_ADC_CHAN);
 	}
-	WRITE_PERI_REG(GPIO_OUT_W1TC_REG, GPIO_VBAT_EN);
-	vTaskDelay(20 / portTICK_PERIOD_MS);
 }
 
 int ioGetChgStatus() {
@@ -163,12 +158,12 @@ void ioInit() {
 		.intr_type=GPIO_INTR_DISABLE,
 		.mode=GPIO_MODE_INPUT,
 		.pull_up_en=1,
-		.pin_bit_mask=GPIO_BTN_RIGHT|GPIO_BTN_LEFT|GPIO_BTN_UP|GPIO_BTN_DOWN|GPIO_BTN_B|GPIO_BTN_A|GPIO_BTN_SELECT|GPIO_BTN_START
+		.pin_bit_mask=GPIO_BTN_RIGHT|GPIO_BTN_LEFT|GPIO_BTN_UP|GPIO_BTN_DOWN|GPIO_BTN_B|GPIO_BTN_A|GPIO_BTN_SELECT|GPIO_BTN_START|GPIO_CHGSTDBY
 	},
 	{
 		.intr_type=GPIO_INTR_DISABLE,
 		.mode=GPIO_MODE_OUTPUT,
-		.pin_bit_mask=GPIO_SOUND_EN|GPIO_VBAT_EN
+		.pin_bit_mask=GPIO_SOUND_EN
 	},
 	{
 		.intr_type=GPIO_INTR_DISABLE,
