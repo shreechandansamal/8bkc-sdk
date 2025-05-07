@@ -22,7 +22,7 @@
 #define KC_CHG_FULL 2				/*!< Charger attached, battery is fully charged. */
 
 #ifdef CONFIG_HW_POCKETSPRITE_CLONE
-#define KC_SCREEN_W 144				/*!< Screen width, excluding bezel area */
+#define KC_SCREEN_W 128				/*!< Screen width, excluding bezel area */
 #define KC_SCREEN_H 128				/*!< Screen height */
 #else
 #define KC_SCREEN_W 80				/*!< Screen width, excluding bezel area */
