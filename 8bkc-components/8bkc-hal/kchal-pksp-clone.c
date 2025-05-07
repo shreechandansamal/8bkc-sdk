@@ -305,7 +305,8 @@ void kchal_init_sdk(int flags) {
 		nvs_get_u32(nvsHandle, BATFULLADC_KEY, &battFullAdcVal);
 	}
 
-	if (config.volume>0) ioAmplifierOn();
+	//ioAmplifierOn not in use
+	// if (config.volume>0) ioAmplifierOn();
 	
 	//If available, grab app nvs handle
 	appfs_handle_t thisApp;
@@ -365,11 +366,12 @@ void kchal_send_fb_partial(const uint16_t *fb, int x, int y, int h, int w) {
 
 
 void kchal_set_volume(uint8_t new_volume) {
-	if (new_volume <= 0) {
-		ioAmplifierOff();
-	} else {
-		ioAmplifierOn();
-	}
+	//ioAmplifierOn and ioAmplifierOff are not in use
+	// if (new_volume <= 0) {
+	// 	ioAmplifierOff();
+	// } else {
+	// 	ioAmplifierOn();
+	// }
 	xSemaphoreTake(configMux, portMAX_DELAY);
 	config.volume=new_volume;
 	xSemaphoreGive(configMux);
@@ -411,10 +413,12 @@ void kchal_sound_start(int rate, int buffsize) {
 void kchal_sound_mute(int doMute) {
 	if (doMute) {
 		dac_i2s_disable();
-		ioAmplifierOff();
+		//ioAmplifierOff not in use
+		// ioAmplifierOff();
 	} else {
 		dac_i2s_enable();
-		if (config.volume > 0) ioAmplifierOn();
+		//ioAmplifierOn not in use
+		// if (config.volume > 0) ioAmplifierOn();
 	}
 }
 
@@ -487,7 +491,8 @@ void kchal_power_down() {
 		rg=(rg&0xffffff)|0xa6000000;
 		REG_WRITE(RTC_CNTL_STORE0_REG, rg);
 	}
-	ioAmplifierOff();
+	//ioAmplifierOff not in use
+	// ioAmplifierOff();
 	ioOledPowerDown();
 	ioPowerDown();
 }
