@@ -9,6 +9,7 @@
 #include "driver/gpio.h"
 #include "esp_heap_alloc_caps.h"
 #include "driver/ledc.h"
+#include "esp_log.h"
 
 #include "sdkconfig.h"
 
@@ -44,7 +45,7 @@
 #define MADCTL_MH    0x04
 
 #define TFT_CMD_SWRESET 0x01
-#define TFT_CMD_SLEEP 0x11
+#define TFT_CMD_SLEEP 0x10
 #define TFT_CMD_DISPLAY_OFF 0x28
 
 static const int DUTY_MAX = 0x1fff;
