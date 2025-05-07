@@ -17,6 +17,10 @@
 #include "driver/rtc_io.h"
 #include "8bkc-hal.h" //for button codes
 
+
+////////////////////////////////////////////////////////////Pin defination starts/////////////////////////////////////////////////////////
+
+/*preserve pin_config for rest  [defined by pebri] 
 //Buttons. Pressing a button pulls down the associated GPIO
 #define GPIO_BTN_RIGHT (1<<12)
 #define GPIO_BTN_LEFT ((uint64_t)1<<39)
@@ -33,6 +37,35 @@
 #define GPIO_DAC (1<<26)
 #define VBAT_ADC_CHAN ADC1_CHANNEL_0
 #define GPIO_CHGSTDBY ((uint64_t)1UL<<33UL) //micro-usb plugged
+*/
+
+/*testing pin_config for rest [defined by me]*/
+//Buttons. Pressing a button pulls down the associated GPIO
+#define GPIO_BTN_RIGHT (1<<25)
+#define GPIO_BTN_LEFT ((uint64_t)1<<33)   //needs ext_pull-up
+#define GPIO_BTN_UP ((uint64_t)1<<34)     //needs ext_pull-up
+#define GPIO_BTN_DOWN ((uint64_t)1<<35)   //needs ext_pull-up
+#define GPIO_BTN_B ((uint64_t)1<<39)
+#define GPIO_BTN_A (1<<0)
+#define GPIO_BTN_SELECT (1<<12)
+#define GPIO_BTN_START (1<<14)
+#define GPIO_BTN_PWR_PIN 32
+#define GPIO_BTN_PWR ((uint64_t)1<<GPIO_BTN_PWR_PIN)
+// #define GPIO_SOUND_EN (1<<27)
+
+//spaker
+#define GPIO_DAC (1<<26)
+
+#define VBAT_ADC_CHAN ADC1_CHANNEL_0//ADC1 channel << 36UL or VP 
+
+#define GPIO_CHGDET (1<<15) //battery is charging, low-active
+#define GPIO_CHGSTDBY ((uint64_t)1UL<<13UL) //micro-usb plugged
+
+
+////////////////////////////////////////////////////////////Pin defination ends/////////////////////////////////////////////////////////
+
+
+
 
 #define VBATMEAS_HISTCT 16
 
@@ -142,15 +175,18 @@ void ioPowerDown() {
 	while(1);
 }
 
-void ioAmplifierOn(){
-	WRITE_PERI_REG(GPIO_OUT_W1TS_REG, GPIO_SOUND_EN);
-	vTaskDelay(20 / portTICK_PERIOD_MS);
-}
 
-void ioAmplifierOff(){
-	WRITE_PERI_REG(GPIO_OUT_W1TC_REG, GPIO_SOUND_EN);
-	vTaskDelay(20 / portTICK_PERIOD_MS);
-}
+/*in my current circuit no Amplifier is available so disabled
+  if in future you want enable them the uncomment all the ioAmplifierOn and ioAmplifierOff */
+// void ioAmplifierOn(){
+// 	WRITE_PERI_REG(GPIO_OUT_W1TS_REG, GPIO_SOUND_EN);
+// 	vTaskDelay(20 / portTICK_PERIOD_MS);
+// }
+
+// void ioAmplifierOff(){
+// 	WRITE_PERI_REG(GPIO_OUT_W1TC_REG, GPIO_SOUND_EN);
+// 	vTaskDelay(20 / portTICK_PERIOD_MS);
+// }
 
 void ioInit() {
 	gpio_config_t io_conf[]={
@@ -160,16 +196,16 @@ void ioInit() {
 		.pull_up_en=1,
 		.pin_bit_mask=GPIO_BTN_RIGHT|GPIO_BTN_LEFT|GPIO_BTN_UP|GPIO_BTN_DOWN|GPIO_BTN_B|GPIO_BTN_A|GPIO_BTN_SELECT|GPIO_BTN_START|GPIO_CHGSTDBY
 	},
-	{
-		.intr_type=GPIO_INTR_DISABLE,
-		.mode=GPIO_MODE_OUTPUT,
-		.pin_bit_mask=GPIO_SOUND_EN
-	},
+	// {
+	// 	.intr_type=GPIO_INTR_DISABLE,
+	// 	.mode=GPIO_MODE_OUTPUT,
+	// 	.pin_bit_mask=GPIO_SOUND_EN
+	// },
 	{
 		.intr_type=GPIO_INTR_DISABLE,
 		.mode=GPIO_MODE_INPUT,
 		.pull_down_en=1,
-		.pin_bit_mask=GPIO_BTN_PWR
+		.pin_bit_mask=GPIO_BTN_PWR|GPIO_CHGSTDBY
 	}
 	};
 	WRITE_PERI_REG(RTC_IO_XTAL_32K_PAD_REG, 0);
