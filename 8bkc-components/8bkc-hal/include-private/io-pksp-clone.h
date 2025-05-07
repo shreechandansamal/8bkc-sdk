@@ -6,8 +6,8 @@
 #define IO_CHG_FULL 2
 
 int ioJoyReadInput();
-void ioAmplifierOn();
-void ioAmplifierOff();
+// void ioAmplifierOn();
+// void ioAmplifierOff();
 void ioInit();
 void ioPowerDown();
 void ioOledPowerDown();
