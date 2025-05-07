@@ -23,8 +23,8 @@ SemaphoreHandle_t oledMux;
 SemaphoreHandle_t configMux;
 
 //The hardware size of the oled.
-#define OLED_REAL_H 128
-#define OLED_REAL_W 160
+#define OLED_REAL_H 130
+#define OLED_REAL_W 130
 
 //The oled is mounted in a bezel that blocks the left and right side of it; the remaining bit has the aspect
 //ratio of 5:4 which is a more narrow screen and what people expect from a machine that can run 8-bit games.
@@ -34,7 +34,7 @@ SemaphoreHandle_t configMux;
 #define OLED_FAKE_H KC_SCREEN_H
 
 //On the left side of the bezel, some pixels show through a hole in the bezel. It is used to fake a power LED.
-#define OLED_LED_X 0
+#define OLED_LED_X 127
 #define OLED_LED_Y 16
 #define OLED_LED_H 3
 #define OLED_LED_W 3
