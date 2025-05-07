@@ -12,12 +12,28 @@
 
 #include "sdkconfig.h"
 
+////////////////////////////////////////////////////////////Pin defination starts/////////////////////////////////////////////////////////
+
+/*preserve pin_config [defined by pebri]
 #define PIN_NUM_MOSI 25
 #define PIN_NUM_CLK  23
 #define PIN_NUM_CS   19
 #define PIN_NUM_DC   22
 #define PIN_NUM_RST  16
 #define PIN_NUM_BCKL 5
+*/
+
+/*testing pin_config [defined by me]*/
+#define PIN_NUM_MOSI 23
+#define PIN_NUM_CLK  18
+#define PIN_NUM_CS   19
+#define PIN_NUM_DC   2
+#define PIN_NUM_RST  4
+#define PIN_NUM_BCKL 5
+
+////////////////////////////////////////////////////////////Pin defination ends/////////////////////////////////////////////////////////
+
+
 
 #define MADCTL_MY    0x80
 #define MADCTL_MX    0x40
@@ -52,6 +68,9 @@ static const tft_init_cmd_t tft_sleep_cmds[] = {
 };
 
 static const tft_init_cmd_t tft_init_cmds[]={
+
+    /* 
+    //ST7735r
     {0x01, {0}, 0x80}, //SWRESET
     //   {0x00, {0}, 0x80}, //NOP delay?
     {0x11, {0}, 0x80}, //SLEEPOUT
@@ -77,7 +96,46 @@ static const tft_init_cmd_t tft_init_cmds[]={
     {0xE1, {0x03, 0x1d, 0x07, 0x06, 0x2E, 0x2C, 0x29, 0x2D, 0x2E, 0x2E, 0x37, 0x3F, 0x00, 0x00, 0x02, 0x10}, 16},
     {0x13, {0}, 0x0}, //NORON
     {0x29, {0}, 0x80}, //DISPON
+    {0, {0}, 0xff} 
+    
+    */
+
+    /*
+    //ST7789
+    {0x01, {0}, 0x80}, //SWRESET
+    //{0x00, {0}, 0x80}, //NOP delay?
+    {0x11, {0}, 0x80}, //SLEEPOUT
+    // {0x3A, {0x55}, 1|0x80}, //COLMOD
+    //{0x36, {(MADCTL_MV)|(MADCTL_MX)}, 1}, // rotated 90 CW
+    //{0x36, {(MADCTL_MX)}, 1}, // Set to Portrait Mode
+    {0x21, {0}, 0}, //INVON
+    {0x36, {MADCTL_MX | MADCTL_MY | TFT_RGB_BGR}, 1},
+    {0x3A, {0x55}, 1|0x80}, //COLMOD
+    {0x2A, {0x00, 0x00, 0x00, 0x7F}, 4}, //CASET
+    {0x2B, {0x00, 0x00, 0x00, 0x7F}, 4}, //RASET
+    // {0x21, {0}, 0}, //INVON
+    {0x13, {0}, 0x0}, //NORON
+    // {0x11, {0}, 0x80},
+    {0x29, {0}, 0x80}, //DISPON
     {0, {0}, 0xff}
+
+    */ 
+
+    //GC9107 128*128
+    {0x01, {0}, 0x80}, //SWRESET
+    //   {0x00, {0}, 0x80}, //NOP delay?
+    {0x11, {0}, 0x80}, //SLEEPOUT
+    {0x3A, {0x55}, 1|0x80}, //COLMOD
+    {0x36, {MADCTL_MX | MADCTL_MY | MADCTL_BGR}, 1},
+    // {0x36, {MADCTL_MV | MADCTL_MY | TFT_RGB_BGR}, 1},
+    {0x2A, {0x00, 0x00, 0x00, 0xF0}, 4}, //CASET
+    {0x2B, {0x00, 0x00, 0x00, 0xF0}, 4}, //RASET
+    {0x21, {0}, 0}, //INVON
+    {0x13, {0}, 0x0}, //NORON
+    {0x29, {0}, 0x80}, //DISPON
+    {0, {0}, 0xff}
+
+
 };
 
 //Send a command to the ST7735R. Uses spi_device_transmit, which waits until the transfer is complete.
@@ -234,12 +292,14 @@ static void tft_init(spi_device_handle_t spi)
 
     //Send all the commands
     while (tft_init_cmds[cmd].databytes!=0xff) {
+        ESP_LOGI("GC9107", "Sending command 0x%02X", tft_init_cmds[cmd].cmd);  // Debug log
         uint8_t dmdata[16];
         tft_cmd(spi, tft_init_cmds[cmd].cmd);
         //Need to copy from flash to DMA'able memory
         memcpy(dmdata, tft_init_cmds[cmd].data, 16);
         tft_data(spi, dmdata, tft_init_cmds[cmd].databytes&0x1F);
         if (tft_init_cmds[cmd].databytes&0x80) {
+            ESP_LOGI("GC9107", "Waiting for delay...");
             vTaskDelay(100 / portTICK_RATE_MS);
         }
         cmd++;
