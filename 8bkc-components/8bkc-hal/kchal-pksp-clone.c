@@ -35,7 +35,7 @@ SemaphoreHandle_t configMux;
 
 //On the left side of the bezel, some pixels show through a hole in the bezel. It is used to fake a power LED.
 #define OLED_LED_X 127
-#define OLED_LED_Y 16
+#define OLED_LED_Y 1
 #define OLED_LED_H 3
 #define OLED_LED_W 3
 
